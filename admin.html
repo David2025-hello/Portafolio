@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Mi Portafolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+    <header class="admin-header">
+        <div class="container">
+            <div class="admin-navbar">
+                <div class="admin-logo">
+                    <h1>Panel de Administración</h1>
+                </div>
+                <div class="admin-nav">
+                    <span class="admin-username">Bienvenido, {{ session.username }}</span>
+                    <a href="{{ url_for('logout') }}" class="logout-btn">Cerrar Sesión</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="admin-main">
+        <div class="container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="admin-tabs">
+                <button class="tab-btn active" data-tab="messages">Mensajes de Contacto</button>
+                <button class="tab-btn" data-tab="projects">Gestionar Proyectos</button>
+                <a href="{{ url_for('home') }}" class="view-site-btn">Ver Sitio</a>
+            </div>
+
+            <div class="tab-content active" id="messages-content">
+                <h2>Mensajes Recibidos</h2>
+                
+                <div class="messages-list">
+                    {% if contacts %}
+                        {% for contact in contacts %}
+                            <div class="message-card">
+                                <div class="message-header">
+                                    <h3>{{ contact.name }}</h3>
+                                    <span class="message-date">{{ contact.date.strftime('%d/%m/%Y %H:%M') }}</span>
+                                </div>
+                                <div class="message-email">{{ contact.email }}</div>
+                                <div class="message-body">
+                                    <p>{{ contact.message }}</p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="no-data">No hay mensajes para mostrar.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="tab-content" id="projects-content">
+                <h2>Gestión de Proyectos</h2>
+                
+                <div class="add-project-form">
+                    <h3>Agregar Nuevo Proyecto</h3>
+                    <form action="{{ url_for('add_project') }}" method="POST">
+                        <div class="form-group">
+                            <label for="title">Título</label>
+                            <input type="text" id="title" name="title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Descripción</label>
+                            <textarea id="description" name="description" rows="4" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="image_url">URL de la Imagen</label>
+                            <input type="text" id="image_url" name="image_url" placeholder="Ruta de la imagen o URL">
+                        </div>
+                        <button type="submit" class="add-btn">Agregar Proyecto</button>
+                    </form>
+                </div>
+                
+                <div class="projects-list">
+                    <h3>Proyectos Actuales</h3>
+                    
+                    {% if projects %}
+                        <div class="projects-grid">
+                            {% for project in projects %}
+                                <div class="project-item">
+                                    <div class="project-content">
+                                        <h4>{{ project.title }}</h4>
+                                        <p>{{ project.description[:100] }}{% if project.description|length > 100 %}...{% endif %}</p>
+                                    </div>
+                                    <div class="project-actions">
+                                        <form action="{{ url_for('delete_project', project_id=project.id) }}" method="POST">
+                                            <button type="submit" class="delete-btn" onclick="return confirm('¿Estás seguro de eliminar este proyecto?')">Eliminar</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="no-data">No hay proyectos para mostrar.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Tab switching functionality
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons and contents
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                // Add active class to clicked button
+                button.classList.add('active');
+                
+                // Show corresponding content
+                const tabId = button.getAttribute('data-tab');
+                document.getElementById(`${tabId}-content`).classList.add('active');
+            });
+        });
+        
+        // Animation for alerts
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                alert.classList.add('fade-out');
+                setTimeout(() => {
+                    alert.remove();
+                }, 500);
+            }, 3000);
+        });
+    </script>
+</body>
+</html>

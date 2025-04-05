@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi portafolio - Portafolio Profesional</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/portafolio.css') }}">
+</head>
+<body>
+    
+    <header>
+        <div class="container navbar">
+            <a href="#" class="logo">Jesus David Olivares Juarez</a>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#home">Inicio</a></li>
+                    <li><a href="#about">Sobre Mí</a></li>
+                    <li><a href="#portfolio">Proyectos</a></li>
+                    <li><a href="#skills">Habilidades</a></li>
+                    <li><a href="#contact">Contacto</a></li>
+                    {% if session.get('user_id') %}
+                    <li><a href="{{ url_for('admin') }}">Admin</a></li>
+                    <li><a href="{{ url_for('logout') }}">Cerrar Sesión</a></li>
+                    {% else %}
+                    <li><a href="{{ url_for('login') }}">Iniciar Sesión</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section id="home">
+        <div class="container hero-content">
+            <h1>Jesus David Olivares Juarez</h1>
+            <p>Estudiante de Tecnologias de la informacion en la UTCH BIS</p>
+            <div class="cta-buttons">
+                <a href="#portfolio" class="btn btn-primary">Ver Proyectos</a>
+                <a href="#contact" class="btn btn-secondary">Contáctame</a>
+            </div>
+        </div>
+    </section>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}" style="position: fixed; top: 100px; right: 20px; z-index: 1000; max-width: 300px;">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <section id="about">
+        <div class="container">
+            <div class="section-header">
+                <h2>Sobre Mí</h2>
+            </div>
+            <div class="about-content">
+                <div class="about-text">
+                    <h3>Desarrollador Web </h3>
+                    <p>Tengo 1 año en la carrera donde he podido tener varios aprendizajes durante mi dessarrollo</p>
+                    
+                    <div id="skills" class="skills-section">
+                        <h4>Habilidades Principales</h4>
+                        <div class="skills-grid">
+                            <div class="skill-item">HTML</div>
+                            <div class="skill-item">CSS</div>
+                            <div class="skill-item">JAVASCRIPT</div>
+                            <div class="skill-item">PYTHON</div>
+                            <div class="skill-item">SQL SERVER</div>
+                            <div class="skill-item">UX/UI Design</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="portfolio">
+        <div class="container">
+            <div class="section-header">
+                <h2>Proyectos Destacados</h2>
+            </div>
+            <div class="portfolio-grid">
+                {% if projects %}
+                    {% for project in projects %}
+                        <div class="project-card">
+                            <div class="project-info">
+                                <h2 class="project-info-item">{{ project.title }}</h2>
+                                <p class="project-info-item">{{ project.description }}</p>
+                                {% if project.image_url %}
+                                <img class="project-info-item" src="{{ project.image_url }}" width="800px"/> 
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="project-card">
+                        <div class="project-info">
+                            <h2 class="project-info-item">Portafolio</h2>
+                            <p class="project-info-item">Este proyecto fue llevado a cabo con el objetivo de mostrar los proyectos que he realizado, las habilidades que 
+                                he adquirido con el tiempo para lograr llevar a cabo estos proyectos.</p>
+                            <img class="project-info-item" src="/static/img/Proyecto_Portafolio.png" width="800px"/> 
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <section id="contact">
+        <div class="container">
+            <div class="section-header">
+                <h2>Contacto</h2>
+            </div>
+            <form class="contact-form" method="POST" action="{{ url_for('contact') }}">
+                <div class="form-group">
+                    <label for="name">Nombre Completo</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Correo Electrónico</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="message">Mensaje</label>
+                    <textarea id="message" name="message" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="submit-btn">Enviar Mensaje</button>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Jesus David Olivares Juarez. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Animación para mensajes flash
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.opacity = '0';
+                    setTimeout(() => {
+                        alert.remove();
+                    }, 500);
+                }, 3000);
+            });
+        });
+    </script>
+</body>
+</html>
